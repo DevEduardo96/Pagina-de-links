@@ -310,13 +310,12 @@
       let currentUser = null;
       let editingLinkId = null;
 
-      // ✅ Executado ao carregar a página
+      // Executado ao carregar a página
       window.addEventListener("load", async () => {
         try {
           const {
             data: { session },
           } = await supabase.auth.getSession();
-
           if (session) {
             const {
               data: { user },
@@ -334,13 +333,11 @@
         }
       });
 
-      // ✅ Tela de login
+      // Exibir telas
       function showLoginScreen() {
         document.getElementById("loginScreen").style.display = "flex";
         document.getElementById("dashboard").classList.add("hidden");
       }
-
-      // ✅ Tela de dashboard
       function showDashboard() {
         document.getElementById("loginScreen").style.display = "none";
         document.getElementById("dashboard").classList.remove("hidden");
@@ -348,41 +345,33 @@
         loadLinks();
       }
 
-      // ✅ Alternar entre formulários
+      // Alternar login/registro
       function showRegisterForm() {
         document.getElementById("loginForm").style.display = "none";
         document.getElementById("registerForm").style.display = "block";
         clearMessage("authMessage");
       }
-
       function showLoginForm() {
         document.getElementById("registerForm").style.display = "none";
         document.getElementById("loginForm").style.display = "block";
         clearMessage("authMessage");
       }
 
-      // ✅ Registro de usuário
+      // Registro
       async function register() {
         const name = document.getElementById("registerName").value;
         const email = document.getElementById("registerEmail").value;
         const password = document.getElementById("registerPassword").value;
-
         if (!name || !email || !password) {
           showMessage("authMessage", "Preencha todos os campos", "error");
           return;
         }
-
         try {
           const { data, error } = await supabase.auth.signUp({
             email,
             password,
-            options: {
-              data: {
-                full_name: name,
-              },
-            },
+            options: { data: { full_name: name } },
           });
-
           if (error) {
             showMessage("authMessage", error.message, "error");
           } else {
@@ -402,27 +391,23 @@
         }
       }
 
-      // ✅ Login
+      // Login
       async function login() {
         const email = document.getElementById("loginEmail").value;
         const password = document.getElementById("loginPassword").value;
-
         if (!email || !password) {
           showMessage("authMessage", "Preencha todos os campos", "error");
           return;
         }
-
         try {
           const { data, error } = await supabase.auth.signInWithPassword({
             email,
             password,
           });
-
           if (error) {
             showMessage("authMessage", error.message, "error");
             return;
           }
-
           const session = data.session;
           if (!session) {
             showMessage(
@@ -432,7 +417,6 @@
             );
             return;
           }
-
           currentUser = data.user;
           showDashboard();
         } catch (error) {
@@ -444,7 +428,7 @@
         }
       }
 
-      // ✅ Logout
+      // Logout
       async function logout() {
         try {
           await supabase.auth.signOut();
@@ -455,37 +439,29 @@
         }
       }
 
-      // ✅ Ver página pública
+      // Ver página pública
       function viewPublicPage() {
         if (!currentUser) {
           alert("Usuário não encontrado");
           return;
         }
-
-        console.log("Abrindo página pública para usuário:", currentUser.id);
         const publicUrl = `./bio.html?user=${currentUser.id}`;
-        console.log("URL da página pública:", publicUrl);
         window.open(publicUrl, "_blank");
       }
 
-      // ✅ Carregar dados do usuário
+      // Carregar perfil
       async function loadUserData() {
         if (!currentUser) return;
-
         try {
-          // Buscar perfil do usuário
           const { data: profile, error } = await supabase
             .from("profiles")
             .select("*")
             .eq("user_id", currentUser.id)
             .single();
-
           if (error && error.code !== "PGRST116") {
             console.error("Erro ao carregar perfil:", error);
             return;
           }
-
-          // Atualizar interface
           const userName =
             profile?.name || currentUser.user_metadata?.full_name || "Usuário";
           const userEmail = currentUser.email;
@@ -497,7 +473,6 @@
           document.getElementById("profileName").value = userName;
           document.getElementById("profileDescription").value = userDescription;
 
-          // Avatar
           const avatar = document.getElementById("userAvatar");
           const profilePreview = document.getElementById("profilePreview");
           const profileInitials = document.getElementById("profileInitials");
@@ -520,18 +495,15 @@
         }
       }
 
-      // ✅ Salvar perfil
+      // Salvar perfil
       async function saveProfile() {
         if (!currentUser) return;
-
         const name = document.getElementById("profileName").value;
         const description = document.getElementById("profileDescription").value;
-
         if (!name) {
           showMessage("dashboardMessage", "Nome é obrigatório", "error");
           return;
         }
-
         try {
           const { error } = await supabase.from("profiles").upsert({
             user_id: currentUser.id,
@@ -539,9 +511,7 @@
             description: description,
             updated_at: new Date().toISOString(),
           });
-
           if (error) throw error;
-
           showMessage(
             "dashboardMessage",
             "Perfil salvo com sucesso!",
@@ -555,34 +525,40 @@
         }
       }
 
-      // ✅ Upload de imagem do perfil
+      // Upload de imagem do perfil (corrigido)
       async function uploadProfileImage() {
-        if (!currentUser) return;
+        if (!currentUser) {
+          alert("Você precisa estar logado!");
+          return;
+        }
 
         const fileInput = document.getElementById("profileImage");
         const file = fileInput.files[0];
-
-        if (!file) return;
+        if (!file) {
+          alert("Selecione um arquivo!");
+          return;
+        }
 
         try {
           const fileExt = file.name.split(".").pop();
-          const fileName = `${currentUser.id}.${fileExt}`;
-
-          const { error: uploadError } = await supabase.storage
-            .from("avatars")
-            .upload(fileName, file, { upsert: true });
+          const filePath = `${currentUser.id}/avatar.${fileExt}`;
+          const { data: uploadData, error: uploadError } =
+            await supabase.storage
+              .from("avatars")
+              .upload(filePath, file, { upsert: true });
 
           if (uploadError) throw uploadError;
 
-          const { data } = supabase.storage
+          const { data: publicData } = supabase.storage
             .from("avatars")
-            .getPublicUrl(fileName);
+            .getPublicUrl(filePath);
+          console.log("URL pública:", publicData.publicUrl);
 
           const { error: updateError } = await supabase
             .from("profiles")
             .upsert({
               user_id: currentUser.id,
-              photo_url: data.publicUrl,
+              photo_url: publicData.publicUrl,
               updated_at: new Date().toISOString(),
             });
 
@@ -601,34 +577,28 @@
         }
       }
 
-      // ✅ Carregar links
+      // Carregar links
       async function loadLinks() {
         if (!currentUser) return;
-
         try {
           const { data: links, error } = await supabase
             .from("links")
             .select("*")
             .eq("user_id", currentUser.id)
             .order("created_at", { ascending: false });
-
           if (error) throw error;
 
           const container = document.getElementById("linksList");
-
           if (!links || links.length === 0) {
             container.innerHTML = `
               <div class="text-center py-8">
                 <div class="text-6xl mb-4">🔗</div>
                 <p class="text-gray-500">Nenhum link adicionado ainda</p>
                 <p class="text-sm text-gray-400">Clique em "Adicionar Link" para começar</p>
-              </div>
-            `;
+              </div>`;
             return;
           }
-
           container.innerHTML = "";
-
           links.forEach((link) => {
             const linkElement = document.createElement("div");
             linkElement.className =
@@ -644,29 +614,22 @@
               <div class="flex gap-2">
                 <button onclick="editLink('${
                   link.id
-                }')" class="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600">
-                  Editar
-                </button>
+                }')" class="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600">Editar</button>
                 <button onclick="deleteLink('${
                   link.id
-                }')" class="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600">
-                  Excluir
-                </button>
-              </div>
-            `;
+                }')" class="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600">Excluir</button>
+              </div>`;
             container.appendChild(linkElement);
           });
         } catch (error) {
           console.error("Erro ao carregar links:", error);
-          document.getElementById("linksList").innerHTML = `
-            <div class="text-center py-6 text-red-500">
-              Erro ao carregar links
-            </div>
-          `;
+          document.getElementById(
+            "linksList"
+          ).innerHTML = `<div class="text-center py-6 text-red-500">Erro ao carregar links</div>`;
         }
       }
 
-      // ✅ Modal de link
+      // Modal de link
       function showAddLinkModal() {
         editingLinkId = null;
         document.getElementById("modalTitle").textContent = "Adicionar Link";
@@ -677,14 +640,13 @@
         document.getElementById("linkModal").classList.remove("hidden");
         document.getElementById("linkModal").classList.add("flex");
       }
-
       function closeLinkModal() {
         document.getElementById("linkModal").classList.add("hidden");
         document.getElementById("linkModal").classList.remove("flex");
         editingLinkId = null;
       }
 
-      // ✅ Editar link
+      // Editar link
       async function editLink(linkId) {
         try {
           const { data: link, error } = await supabase
@@ -692,9 +654,7 @@
             .select("*")
             .eq("id", linkId)
             .single();
-
           if (error) throw error;
-
           editingLinkId = linkId;
           document.getElementById("modalTitle").textContent = "Editar Link";
           document.getElementById("linkTitle").value = link.title;
@@ -709,23 +669,19 @@
         }
       }
 
-      // ✅ Salvar link
+      // Salvar link
       async function saveLink() {
         if (!currentUser) return;
-
         const title = document.getElementById("linkTitle").value;
         const url = document.getElementById("linkUrl").value;
         const icon = document.getElementById("linkIcon").value;
         const type = document.getElementById("linkType").value;
-
         if (!title || !url) {
           alert("Título e URL são obrigatórios");
           return;
         }
-
         try {
           if (editingLinkId) {
-            // Atualizar link existente
             const { error } = await supabase
               .from("links")
               .update({
@@ -736,7 +692,6 @@
                 updated_at: new Date().toISOString(),
               })
               .eq("id", editingLinkId);
-
             if (error) throw error;
             showMessage(
               "dashboardMessage",
@@ -744,7 +699,6 @@
               "success"
             );
           } else {
-            // Criar novo link
             const { error } = await supabase.from("links").insert({
               user_id: currentUser.id,
               title,
@@ -753,7 +707,6 @@
               type,
               created_at: new Date().toISOString(),
             });
-
             if (error) throw error;
             showMessage(
               "dashboardMessage",
@@ -761,7 +714,6 @@
               "success"
             );
           }
-
           closeLinkModal();
           loadLinks();
           setTimeout(() => clearMessage("dashboardMessage"), 3000);
@@ -771,18 +723,15 @@
         }
       }
 
-      // ✅ Excluir link
+      // Excluir link
       async function deleteLink(linkId) {
         if (!confirm("Tem certeza que deseja excluir este link?")) return;
-
         try {
           const { error } = await supabase
             .from("links")
             .delete()
             .eq("id", linkId);
-
           if (error) throw error;
-
           showMessage(
             "dashboardMessage",
             "Link excluído com sucesso!",
@@ -796,7 +745,7 @@
         }
       }
 
-      // ✅ Mostrar mensagens
+      // Exibir mensagens
       function showMessage(elementId, message, type) {
         const element = document.getElementById(elementId);
         const className =
@@ -805,19 +754,17 @@
             : "bg-green-100 text-green-700 border-green-300";
         element.innerHTML = `<div class="p-3 rounded-lg border ${className} mb-4">${message}</div>`;
       }
-
       function clearMessage(elementId) {
         document.getElementById(elementId).innerHTML = "";
       }
 
-      // ✅ Event listeners para teclas Enter
+      // Teclas Enter
       document.addEventListener("DOMContentLoaded", function () {
         document
           .getElementById("loginPassword")
           .addEventListener("keypress", function (e) {
             if (e.key === "Enter") login();
           });
-
         document
           .getElementById("registerPassword")
           .addEventListener("keypress", function (e) {
