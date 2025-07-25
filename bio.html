@@ -10,31 +10,6 @@
   <body
     class="bg-[#0a0e1a] text-white min-h-screen overflow-x-hidden relative font-sans"
   >
-    <!-- Background elements -->
-    <div class="fixed inset-0 pointer-events-none z-0">
-      <div
-        class="absolute top-[20%] left-[-100px] w-[300px] h-[1px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-30 animate-pulse"
-      ></div>
-      <div
-        class="absolute top-[60%] right-[-100px] w-[250px] h-[1px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-30 animate-pulse delay-1000"
-      ></div>
-      <div
-        class="absolute top-[80%] left-[10%] w-[200px] h-[1px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-30 animate-pulse delay-2000"
-      ></div>
-      <div
-        class="absolute top-[25%] left-[15%] w-1.5 h-1.5 bg-cyan-400 rounded-full shadow-[0_0_10px_#00bfff] animate-ping delay-[500ms]"
-      ></div>
-      <div
-        class="absolute top-[45%] right-[20%] w-1.5 h-1.5 bg-cyan-400 rounded-full shadow-[0_0_10px_#00bfff] animate-ping delay-[1500ms]"
-      ></div>
-      <div
-        class="absolute top-[70%] left-[25%] w-1.5 h-1.5 bg-cyan-400 rounded-full shadow-[0_0_10px_#00bfff] animate-ping delay-[2500ms]"
-      ></div>
-      <div
-        class="absolute top-[85%] right-[30%] w-1.5 h-1.5 bg-cyan-400 rounded-full shadow-[0_0_10px_#00bfff] animate-ping delay-[3500ms]"
-      ></div>
-    </div>
-
     <!-- Loading Screen -->
     <div
       id="loadingScreen"
@@ -88,49 +63,33 @@
           Links de contato:
         </p>
       </div>
-
       <div class="flex flex-col gap-4 mb-10">
-        <div id="linksContainer">
-          <!-- Os links carregados do Supabase aparecerão aqui -->
-        </div>
+        <div id="linksContainer"></div>
       </div>
-
-      <!-- Social Media Links (Links do tipo 'social' aparecerão aqui) -->
       <div
         id="socialContainer"
         class="flex justify-center gap-6 animate-fade-up"
-      >
-        <!-- Links sociais aparecerão aqui -->
-      </div>
+      ></div>
     </div>
 
     <script>
-      // Configuração do Supabase
       const SUPABASE_URL = "https://mfuiqabijexayjoelqrx.supabase.co";
       const SUPABASE_ANON_KEY =
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1mdWlxYWJpamV4YXlqb2VscXJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0NTIxMzMsImV4cCI6MjA2OTAyODEzM30._vU2hLj5wJyEi4ggKV3zOWdtoIUd_PAhCEZWPce4WXU";
-
       const supabase = window.supabase.createClient(
         SUPABASE_URL,
         SUPABASE_ANON_KEY
       );
 
-      // Debug - verificar se Supabase foi carregado
-      console.log("Supabase carregado:", !!window.supabase);
-      console.log("Cliente criado:", !!supabase);
-
-      // Função para obter parâmetros da URL
       function getUrlParameter(name) {
         const urlParams = new URLSearchParams(window.location.search);
         return urlParams.get(name);
       }
 
-      // Função para mostrar telas
       function showScreen(screenId) {
         document.getElementById("loadingScreen").style.display = "none";
         document.getElementById("errorScreen").classList.add("hidden");
         document.getElementById("mainContent").classList.add("hidden");
-
         if (screenId === "loading") {
           document.getElementById("loadingScreen").style.display = "block";
         } else if (screenId === "error") {
@@ -140,97 +99,51 @@
         }
       }
 
-      // Função para carregar perfil do usuário
       async function loadUserProfile(userId) {
-        try {
-          console.log("Buscando perfil para userId:", userId);
-
-          const { data: profile, error } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("user_id", userId)
-            .single();
-
-          console.log("Resultado da busca perfil:", { data: profile, error });
-
-          if (error && error.code !== "PGRST116") {
-            console.error("Erro na consulta perfil:", error);
-            throw error;
-          }
-
-          // Se não houver perfil, retornar dados padrão
-          if (!profile || error?.code === "PGRST116") {
-            console.log("Perfil não encontrado, usando dados padrão");
-            return {
-              name: "Usuário",
-              description: "Perfil em construção...",
-              photo_url: null,
-            };
-          }
-
-          return profile;
-        } catch (error) {
-          console.error("Erro ao carregar perfil:", error);
-          // Retornar dados padrão em caso de erro
-          return {
+        const { data: profile, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("user_id", userId)
+          .single();
+        if (error && error.code !== "PGRST116") return null;
+        return (
+          profile || {
             name: "Usuário",
             description: "Perfil em construção...",
             photo_url: null,
-          };
-        }
-      }
-
-      // Função para carregar links do usuário
-      async function loadUserLinks(userId) {
-        try {
-          console.log("Buscando links para userId:", userId);
-
-          const { data: links, error } = await supabase
-            .from("links")
-            .select("*")
-            .eq("user_id", userId)
-            .order("created_at", { ascending: false });
-
-          console.log("Resultado da busca links:", { data: links, error });
-
-          if (error) {
-            console.error("Erro na consulta links:", error);
-            return []; // Retornar array vazio em caso de erro
           }
-
-          return links || [];
-        } catch (error) {
-          console.error("Erro ao carregar links:", error);
-          return [];
-        }
+        );
       }
 
-      // Função para renderizar perfil
+      async function loadUserLinks(userId) {
+        const { data: links, error } = await supabase
+          .from("links")
+          .select("*")
+          .eq("user_id", userId)
+          .order("created_at", { ascending: false });
+        return links || [];
+      }
+
       function renderProfile(profile) {
         const userName = profile.name || "Usuário";
         const userDescription =
           profile.description || "Perfil em construção...";
         const userPhoto = profile.photo_url;
-
-        // Atualizar título da página
         document.getElementById(
           "pageTitle"
         ).textContent = `${userName} - Links`;
         document.title = `${userName} - Links`;
-
-        // Atualizar nome
         document.getElementById("userName").textContent = userName;
-
-        // Atualizar descrição
         document.getElementById("userDescription").textContent =
           userDescription;
 
-        // Atualizar avatar
         const avatarContainer = document.getElementById("userAvatar");
         const initialsElement = document.getElementById("userInitials");
-
         if (userPhoto) {
-          avatarContainer.innerHTML = `<img src="${userPhoto}" alt="${userName}" class="w-full h-full object-cover rounded-full">`;
+          const updatedPhoto = userPhoto.includes("?t=")
+            ? userPhoto
+            : `${userPhoto}?t=${Date.now()}`;
+          avatarContainer.innerHTML = `<img src="${updatedPhoto}" alt="${userName}" class="w-full h-full object-cover rounded-full">`;
         } else {
           const initials = userName
             .split(" ")
@@ -242,134 +155,56 @@
         }
       }
 
-      // Função para renderizar links
       function renderLinks(links) {
         const linksContainer = document.getElementById("linksContainer");
         const socialContainer = document.getElementById("socialContainer");
-
-        // Separar links por tipo
         const mainLinks = links.filter((link) => link.type !== "social");
         const socialLinks = links.filter((link) => link.type === "social");
 
-        // Renderizar links principais
-        if (mainLinks.length === 0) {
-          linksContainer.innerHTML = `
-            <div class="text-center py-8">
-              <div class="text-4xl mb-4">🔗</div>
-              <p class="text-gray-400">Nenhum link disponível</p>
-            </div>
-          `;
-        } else {
-          linksContainer.innerHTML = "";
-          mainLinks.forEach((link) => {
-            const linkElement = document.createElement("a");
-            linkElement.href = link.url;
-            linkElement.target = "_blank";
-            linkElement.rel = "noopener noreferrer";
-            linkElement.className =
-              "link-button bg-gradient-to-br from-blue-900 to-blue-500 border-2 border-cyan-400 rounded-xl py-4 px-6 text-white font-bold text-lg flex items-center justify-center gap-2 hover:scale-[1.02] hover:shadow-lg hover:border-white transition mb-3 transform hover:shadow-[0_0_20px_rgba(0,191,255,0.3)]";
+        linksContainer.innerHTML = mainLinks.length
+          ? mainLinks
+              .map(
+                (link) =>
+                  `<a href="${
+                    link.url
+                  }" target="_blank" class="link-button bg-gradient-to-br from-blue-900 to-blue-500 border-2 border-cyan-400 rounded-xl py-4 px-6 text-white font-bold text-lg flex items-center justify-center gap-2 hover:scale-[1.02] transition">${
+                    link.icon || "🔗"
+                  } ${link.title}</a>`
+              )
+              .join("")
+          : `<div class="text-center py-8"><div class="text-4xl mb-4">🔗</div><p class="text-gray-400">Nenhum link disponível</p></div>`;
 
-            linkElement.innerHTML = `
-              <span class="text-xl">${link.icon || "🔗"}</span> 
-              <span>${link.title}</span>
-            `;
-
-            linksContainer.appendChild(linkElement);
-          });
-        }
-
-        // Renderizar links sociais
-        if (socialLinks.length > 0) {
-          socialContainer.innerHTML = "";
-          socialLinks.forEach((link) => {
-            const socialElement = document.createElement("a");
-            socialElement.href = link.url;
-            socialElement.target = "_blank";
-            socialElement.rel = "noopener noreferrer";
-            socialElement.title = link.title;
-            socialElement.className =
-              "w-12 h-12 rounded-full flex items-center justify-center text-white text-xl bg-gradient-to-br from-pink-500 via-purple-600 to-indigo-600 hover:scale-110 hover:shadow-lg transition transform hover:shadow-[0_0_15px_rgba(168,85,247,0.4)]";
-
-            socialElement.innerHTML = `<span>${link.icon || "🔗"}</span>`;
-
-            socialContainer.appendChild(socialElement);
-          });
-        } else {
-          // Links padrão se não houver links sociais
-          socialContainer.innerHTML = `
-            <div class="w-12 h-12 rounded-full flex items-center justify-center text-white text-xl bg-gradient-to-br from-pink-500 via-purple-600 to-indigo-600 opacity-50">
-              📷
-            </div>
-            <div class="w-12 h-12 rounded-full flex items-center justify-center text-white text-xl bg-blue-600 opacity-50">
-              📘
-            </div>
-            <div class="w-12 h-12 rounded-full flex items-center justify-center text-white text-xl bg-red-600 opacity-50">
-              📺
-            </div>
-          `;
-        }
+        socialContainer.innerHTML = socialLinks.length
+          ? socialLinks
+              .map(
+                (link) =>
+                  `<a href="${
+                    link.url
+                  }" target="_blank" class="w-12 h-12 rounded-full flex items-center justify-center text-white text-xl bg-gradient-to-br from-pink-500 via-purple-600 to-indigo-600">${
+                    link.icon || "🔗"
+                  }</a>`
+              )
+              .join("")
+          : `<div class="w-12 h-12 rounded-full flex items-center justify-center text-white text-xl bg-gradient-to-br from-pink-500 via-purple-600 to-indigo-600 opacity-50">📷</div>`;
       }
 
-      // Função principal para carregar página
       async function loadPage() {
-        console.log("Iniciando carregamento da página...");
         showScreen("loading");
-
-        // Obter ID do usuário da URL
         const userId = getUrlParameter("user");
-        console.log("User ID da URL:", userId);
-
-        if (!userId) {
-          console.log("Nenhum User ID encontrado na URL");
-          showScreen("error");
-          return;
-        }
-
-        try {
-          console.log("Carregando dados do usuário:", userId);
-
-          // Carregar perfil e links
-          const [profile, links] = await Promise.all([
-            loadUserProfile(userId),
-            loadUserLinks(userId),
-          ]);
-
-          console.log("Perfil carregado:", profile);
-          console.log("Links carregados:", links);
-
-          if (!profile) {
-            console.log("Perfil não encontrado");
-            showScreen("error");
-            return;
-          }
-
-          // Renderizar conteúdo
-          renderProfile(profile);
-          renderLinks(links);
-
-          // Mostrar conteúdo principal
-          showScreen("main");
-          console.log("Página carregada com sucesso!");
-        } catch (error) {
-          console.error("Erro ao carregar página:", error);
-          showScreen("error");
-        }
+        if (!userId) return showScreen("error");
+        const [profile, links] = await Promise.all([
+          loadUserProfile(userId),
+          loadUserLinks(userId),
+        ]);
+        if (!profile) return showScreen("error");
+        renderProfile(profile);
+        renderLinks(links);
+        showScreen("main");
       }
 
-      // Carregar página quando DOM estiver pronto
-      document.addEventListener("DOMContentLoaded", function () {
-        console.log("DOM carregado, iniciando...");
-
-        // Aguardar um pouco para garantir que o Supabase foi carregado
-        setTimeout(loadPage, 500);
-      });
-
-      // Fallback caso DOMContentLoaded já tenha disparado
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", loadPage);
-      } else {
-        setTimeout(loadPage, 500);
-      }
+      document.addEventListener("DOMContentLoaded", () =>
+        setTimeout(loadPage, 500)
+      );
     </script>
   </body>
 </html>
