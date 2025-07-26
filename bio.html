@@ -1,210 +1,596 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="scroll-smooth">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title id="pageTitle">Perfil - Links</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/dist/umd/supabase.min.js"></script>
+    <title>Meus Links</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/supabase-js/2.38.0/umd.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Arial", sans-serif;
+        background: #0a0e1a;
+        color: white;
+        min-height: 100vh;
+        overflow-x: hidden;
+        position: relative;
+      }
+
+      /* Background animated elements */
+      .bg-elements {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      .circuit-line {
+        position: absolute;
+        background: linear-gradient(90deg, transparent, #00bfff, transparent);
+        height: 1px;
+        opacity: 0.3;
+        animation: pulse 3s ease-in-out infinite;
+      }
+
+      .circuit-line:nth-child(1) {
+        top: 20%;
+        left: -100px;
+        width: 300px;
+        animation-delay: 0s;
+      }
+
+      .circuit-line:nth-child(2) {
+        top: 60%;
+        right: -100px;
+        width: 250px;
+        animation-delay: 1s;
+      }
+
+      .circuit-line:nth-child(3) {
+        top: 80%;
+        left: 10%;
+        width: 200px;
+        animation-delay: 2s;
+      }
+
+      .node {
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        background: #00bfff;
+        border-radius: 50%;
+        box-shadow: 0 0 10px #00bfff;
+        animation: glow 2s ease-in-out infinite alternate;
+      }
+
+      .node:nth-child(4) {
+        top: 25%;
+        left: 15%;
+        animation-delay: 0.5s;
+      }
+      .node:nth-child(5) {
+        top: 45%;
+        right: 20%;
+        animation-delay: 1.5s;
+      }
+      .node:nth-child(6) {
+        top: 70%;
+        left: 25%;
+        animation-delay: 2.5s;
+      }
+      .node:nth-child(7) {
+        top: 85%;
+        right: 30%;
+        animation-delay: 3.5s;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 0.3;
+        }
+        50% {
+          opacity: 0.8;
+        }
+      }
+
+      @keyframes glow {
+        0% {
+          box-shadow: 0 0 5px #00bfff;
+        }
+        100% {
+          box-shadow: 0 0 20px #00bfff, 0 0 30px #00bfff;
+        }
+      }
+
+      /* Main content */
+      .container {
+        position: relative;
+        z-index: 2;
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 40px 20px;
+        text-align: center;
+      }
+
+      .profile-section {
+        margin-bottom: 40px;
+        animation: slideDown 1s ease-out;
+      }
+
+      .profile-image {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        margin: 0 auto 20px;
+        background: linear-gradient(45deg, #00bfff, #0080ff);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        color: white;
+        box-shadow: 0 0 30px rgba(0, 191, 255, 0.3);
+        animation: profileGlow 3s ease-in-out infinite;
+        overflow: hidden;
+      }
+
+      .profile-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+      }
+
+      @keyframes profileGlow {
+        0%,
+        100% {
+          box-shadow: 0 0 30px rgba(0, 191, 255, 0.3);
+        }
+        50% {
+          box-shadow: 0 0 50px rgba(0, 191, 255, 0.6);
+        }
+      }
+
+      .name {
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        background: linear-gradient(45deg, #00bfff, #ffffff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .description {
+        font-size: 14px;
+        color: #888;
+        margin-bottom: 30px;
+        line-height: 1.5;
+      }
+
+      .contact-title {
+        font-size: 16px;
+        color: #00bfff;
+        margin-bottom: 20px;
+        font-weight: bold;
+      }
+
+      .links-section {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 30px;
+      }
+
+      .link-button {
+        background: linear-gradient(45deg, #1e3a8a, #3b82f6);
+        border: 2px solid #00bfff;
+        border-radius: 10px;
+        padding: 15px 20px;
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        animation: slideUp 1s ease-out;
+        animation-fill-mode: both;
+      }
+
+      .link-button:nth-child(1) {
+        animation-delay: 0.2s;
+      }
+      .link-button:nth-child(2) {
+        animation-delay: 0.4s;
+      }
+      .link-button:nth-child(3) {
+        animation-delay: 0.6s;
+      }
+      .link-button:nth-child(4) {
+        animation-delay: 0.8s;
+      }
+
+      .link-button::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transition: left 0.5s ease;
+      }
+
+      .link-button:hover::before {
+        left: 100%;
+      }
+
+      .link-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0, 191, 255, 0.3);
+        border-color: #ffffff;
+      }
+
+      .link-button:active {
+        transform: translateY(-1px);
+      }
+
+      .social-links {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        animation: slideUp 1s ease-out 1s both;
+      }
+
+      .social-button {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        color: white;
+        font-size: 20px;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        background: linear-gradient(45deg, #e4405f, #833ab4, #4f5bd5);
+      }
+
+      .social-button:hover {
+        transform: translateY(-5px) scale(1.1);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        border-color: #ffffff;
+      }
+
+      /* Loading Screen */
+      .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #0a0e1a;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .spinner {
+        width: 60px;
+        height: 60px;
+        border: 4px solid rgba(0, 191, 255, 0.3);
+        border-top: 4px solid #00bfff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .loading-text {
+        color: #00bfff;
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      /* Error Screen */
+      .error-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #0a0e1a;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        text-align: center;
+        padding: 20px;
+      }
+
+      .error-icon {
+        font-size: 80px;
+        margin-bottom: 20px;
+        opacity: 0.7;
+      }
+
+      .error-title {
+        font-size: 24px;
+        font-weight: bold;
+        color: #ff6b6b;
+        margin-bottom: 10px;
+      }
+
+      .error-message {
+        color: #888;
+        font-size: 16px;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Responsive */
+      @media (max-width: 480px) {
+        .container {
+          padding: 20px 15px;
+        }
+
+        .name {
+          font-size: 24px;
+        }
+
+        .link-button {
+          padding: 12px 15px;
+          font-size: 14px;
+        }
+      }
+    </style>
   </head>
-  <body
-    class="bg-[#0a0e1a] text-white min-h-screen overflow-x-hidden relative font-sans"
-  >
+  <body>
     <!-- Loading Screen -->
-    <div
-      id="loadingScreen"
-      class="relative z-10 max-w-md mx-auto py-20 px-5 text-center"
-    >
-      <div
-        class="animate-spin w-12 h-12 border-4 border-cyan-400 border-t-transparent rounded-full mx-auto mb-4"
-      ></div>
-      <p class="text-gray-400">Carregando perfil...</p>
+    <div id="loadingScreen" class="loading-screen">
+      <div class="spinner"></div>
+      <div class="loading-text">Carregando perfil...</div>
     </div>
 
     <!-- Error Screen -->
-    <div
-      id="errorScreen"
-      class="hidden relative z-10 max-w-md mx-auto py-20 px-5 text-center"
-    >
-      <div class="text-6xl mb-4">😕</div>
-      <h1 class="text-2xl font-bold text-red-400 mb-2">
-        Perfil não encontrado
-      </h1>
-      <p class="text-gray-400">
-        Este perfil não existe ou não está disponível.
-      </p>
+    <div id="errorScreen" class="error-screen hidden">
+      <div class="error-icon">😕</div>
+      <div class="error-title">Perfil não encontrado</div>
+      <div class="error-message">
+        O perfil solicitado não existe ou não está disponível.<br />
+        Verifique a URL e tente novamente.
+      </div>
     </div>
 
-    <!-- Main content -->
-    <div
-      id="mainContent"
-      class="hidden relative z-10 max-w-md mx-auto py-10 px-5 text-center"
-    >
-      <div class="mb-10 animate-fade-down">
-        <div
-          id="userAvatar"
-          class="w-24 h-24 mx-auto mb-5 rounded-full flex items-center justify-center bg-gradient-to-br from-cyan-400 to-blue-600 text-4xl shadow-[0_0_30px_rgba(0,191,255,0.3)] animate-pulse overflow-hidden"
-        >
-          <span id="userInitials">U</span>
+    <!-- Background Elements -->
+    <div class="bg-elements">
+      <div class="circuit-line"></div>
+      <div class="circuit-line"></div>
+      <div class="circuit-line"></div>
+      <div class="node"></div>
+      <div class="node"></div>
+      <div class="node"></div>
+      <div class="node"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="mainContent" class="hidden">
+      <div class="container">
+        <div class="profile-section">
+          <div class="profile-image" id="userAvatar">
+            <span id="userInitials">U</span>
+          </div>
+          <h1 class="name" id="userName">Carregando...</h1>
+          <p class="description" id="userDescription">
+            Carregando informações...
+          </p>
+          <p class="contact-title">Links de contato:</p>
         </div>
-        <h1
-          id="userName"
-          class="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-white bg-clip-text text-transparent"
-        >
-          Carregando...
-        </h1>
-        <p
-          id="userDescription"
-          class="text-sm text-gray-400 mt-2 leading-relaxed"
-        >
-          Carregando descrição...
-        </p>
-        <p class="text-base text-cyan-400 mt-6 font-semibold">
-          Links de contato:
-        </p>
+
+        <div class="links-section" id="linksContainer">
+          <!-- Links serão carregados aqui -->
+        </div>
+
+        <div class="social-links" id="socialContainer">
+          <!-- Redes sociais serão carregadas aqui -->
+        </div>
       </div>
-      <div class="flex flex-col gap-4 mb-10">
-        <div id="linksContainer"></div>
-      </div>
-      <div
-        id="socialContainer"
-        class="flex justify-center gap-6 animate-fade-up"
-      ></div>
     </div>
 
-    <script>
-      const SUPABASE_URL = "https://mfuiqabijexayjoelqrx.supabase.co";
-      const SUPABASE_ANON_KEY =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1mdWlxYWJpamV4YXlqb2VscXJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0NTIxMzMsImV4cCI6MjA2OTAyODEzM30._vU2hLj5wJyEi4ggKV3zOWdtoIUd_PAhCEZWPce4WXU";
-      const supabase = window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY
-      );
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+      import {
+        getFirestore,
+        collection,
+        query,
+        where,
+        getDocs,
+        orderBy,
+      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+      import {
+        getStorage,
+        ref,
+        getDownloadURL,
+      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
-      function getUrlParameter(name) {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(name);
-      }
+      const firebaseConfig = {
+        apiKey: "AIzaSyDAOcF_0Q1aDDTDrrvi_92vP38BN9fSXlg",
+        authDomain: "linknectix.firebaseapp.com",
+        projectId: "linknectix",
+        storageBucket: "linknectix.appspot.com",
+        messagingSenderId: "408127476231",
+        appId: "1:408127476231:web:f075289ee352f32dd4d0a2",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const storage = getStorage(app);
+
+      const userId = new URLSearchParams(window.location.search).get("user");
 
       function showScreen(screenId) {
         document.getElementById("loadingScreen").style.display = "none";
         document.getElementById("errorScreen").classList.add("hidden");
         document.getElementById("mainContent").classList.add("hidden");
-        if (screenId === "loading") {
+
+        if (screenId === "loading")
           document.getElementById("loadingScreen").style.display = "block";
-        } else if (screenId === "error") {
+        if (screenId === "error")
           document.getElementById("errorScreen").classList.remove("hidden");
-        } else if (screenId === "main") {
+        if (screenId === "main")
           document.getElementById("mainContent").classList.remove("hidden");
+      }
+
+      async function loadPage() {
+        showScreen("loading");
+
+        if (!userId) return showScreen("error");
+
+        try {
+          const profileSnap = await getDocs(
+            query(collection(db, "profiles"), where("user_id", "==", userId))
+          );
+          const profileDoc = profileSnap.docs[0];
+
+          if (!profileDoc) return showScreen("error");
+
+          const profile = profileDoc.data();
+          renderProfile(profile);
+
+          const linksSnap = await getDocs(
+            query(
+              collection(db, "links"),
+              where("user_id", "==", userId),
+              orderBy("created_at", "desc")
+            )
+          );
+          const links = linksSnap.docs.map((doc) => doc.data());
+
+          renderLinks(links);
+          showScreen("main");
+        } catch (e) {
+          console.error("Erro:", e);
+          showScreen("error");
         }
       }
 
-      async function loadUserProfile(userId) {
-        const { data: profile, error } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("user_id", userId)
-          .single();
-        if (error && error.code !== "PGRST116") return null;
-        return (
-          profile || {
-            name: "Usuário",
-            description: "Perfil em construção...",
-            photo_url: null,
-          }
-        );
-      }
-
-      async function loadUserLinks(userId) {
-        const { data: links, error } = await supabase
-          .from("links")
-          .select("*")
-          .eq("user_id", userId)
-          .order("created_at", { ascending: false });
-        return links || [];
-      }
-
-      function renderProfile(profile) {
+      async function renderProfile(profile) {
         const userName = profile.name || "Usuário";
-        const userDescription =
-          profile.description || "Perfil em construção...";
-        const userPhoto = profile.photo_url;
-        document.getElementById(
-          "pageTitle"
-        ).textContent = `${userName} - Links`;
+        const userDescription = profile.description || "";
+        const avatarPath = profile.avatar_url;
+
         document.title = `${userName} - Links`;
         document.getElementById("userName").textContent = userName;
         document.getElementById("userDescription").textContent =
           userDescription;
 
-        const avatarContainer = document.getElementById("userAvatar");
-        const initialsElement = document.getElementById("userInitials");
-        if (userPhoto) {
-          const updatedPhoto = userPhoto.includes("?t=")
-            ? userPhoto
-            : `${userPhoto}?t=${Date.now()}`;
-          avatarContainer.innerHTML = `<img src="${updatedPhoto}" alt="${userName}" class="w-full h-full object-cover rounded-full">`;
+        if (avatarPath) {
+          try {
+            const avatarRef = ref(storage, avatarPath);
+            const avatarUrl = await getDownloadURL(avatarRef);
+            document.getElementById(
+              "userAvatar"
+            ).innerHTML = `<img src="${avatarUrl}" alt="${userName}" />`;
+          } catch (err) {
+            console.warn("Erro ao carregar avatar:", err);
+          }
         } else {
-          const initials = userName
-            .split(" ")
-            .map((n) => n[0])
-            .join("")
-            .toUpperCase()
-            .substring(0, 2);
-          initialsElement.textContent = initials;
+          const initials = userName[0]?.toUpperCase() || "U";
+          document.getElementById("userInitials").textContent = initials;
         }
       }
 
       function renderLinks(links) {
         const linksContainer = document.getElementById("linksContainer");
         const socialContainer = document.getElementById("socialContainer");
+
         const mainLinks = links.filter((link) => link.type !== "social");
         const socialLinks = links.filter((link) => link.type === "social");
 
         linksContainer.innerHTML = mainLinks.length
           ? mainLinks
               .map(
-                (link) =>
-                  `<a href="${
-                    link.url
-                  }" target="_blank" class="link-button bg-gradient-to-br from-blue-900 to-blue-500 border-2 border-cyan-400 rounded-xl py-4 px-6 text-white font-bold text-lg flex items-center justify-center gap-2 hover:scale-[1.02] transition">${
-                    link.icon || "🔗"
-                  } ${link.title}</a>`
+                (link) => `
+              <a href="${link.url}" target="_blank" class="link-button">
+                ${link.icon || "🔗"} ${link.title}
+              </a>
+            `
               )
               .join("")
-          : `<div class="text-center py-8"><div class="text-4xl mb-4">🔗</div><p class="text-gray-400">Nenhum link disponível</p></div>`;
+          : `<p class="text-gray-400">Nenhum link disponível</p>`;
 
         socialContainer.innerHTML = socialLinks.length
           ? socialLinks
               .map(
-                (link) =>
-                  `<a href="${
-                    link.url
-                  }" target="_blank" class="w-12 h-12 rounded-full flex items-center justify-center text-white text-xl bg-gradient-to-br from-pink-500 via-purple-600 to-indigo-600">${
-                    link.icon || "🔗"
-                  }</a>`
+                (link) => `
+              <a href="${
+                link.url
+              }" target="_blank" class="social-button" title="${link.title}">
+                ${link.icon || "🔗"}
+              </a>
+            `
               )
               .join("")
-          : `<div class="w-12 h-12 rounded-full flex items-center justify-center text-white text-xl bg-gradient-to-br from-pink-500 via-purple-600 to-indigo-600 opacity-50">📷</div>`;
+          : `<div class="social-button opacity-50" title="Nenhuma rede social">📷</div>`;
       }
 
-      async function loadPage() {
-        showScreen("loading");
-        const userId = getUrlParameter("user");
-        if (!userId) return showScreen("error");
-        const [profile, links] = await Promise.all([
-          loadUserProfile(userId),
-          loadUserLinks(userId),
-        ]);
-        if (!profile) return showScreen("error");
-        renderProfile(profile);
-        renderLinks(links);
-        showScreen("main");
-      }
-
-      document.addEventListener("DOMContentLoaded", () =>
-        setTimeout(loadPage, 500)
-      );
+      document.addEventListener("DOMContentLoaded", () => {
+        setTimeout(loadPage, 500);
+      });
     </script>
   </body>
 </html>

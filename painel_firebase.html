@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Painel Administrativo - Gerenciador de Links</title>
+    
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: #333;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      /* Login Screen */
+      .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .login-card {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+      }
+
+      .login-title {
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .login-subtitle {
+        color: #666;
+        margin-bottom: 30px;
+        font-size: 16px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+        text-align: left;
+      }
+
+      .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #333;
+      }
+
+      .form-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e1e5e9;
+        border-radius: 12px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+      }
+
+      .form-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      .btn {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .btn-primary {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+      }
+
+      .btn-secondary {
+        background: #f8f9fa;
+        color: #667eea;
+        border: 2px solid #667eea;
+        margin-top: 10px;
+      }
+
+      .btn-secondary:hover {
+        background: #667eea;
+        color: white;
+      }
+
+      /* Dashboard */
+      .dashboard {
+        display: none;
+      }
+
+      .dashboard.active {
+        display: block;
+      }
+
+      .header {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+
+      .header-left {
+        flex: 1;
+      }
+
+      .header-title {
+        font-size: 32px;
+        font-weight: bold;
+        margin-bottom: 5px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .header-subtitle {
+        color: #666;
+        font-size: 16px;
+      }
+
+      .user-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .user-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 18px;
+      }
+
+      .logout-btn {
+        padding: 8px 16px;
+        background: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s ease;
+      }
+
+      .logout-btn:hover {
+        background: #c82333;
+        transform: translateY(-1px);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 30px;
+        margin-bottom: 30px;
+      }
+
+      .card {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      .card-title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        color: #333;
+      }
+
+      /* Profile Section */
+      .profile-upload {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .profile-preview {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        margin: 0 auto 20px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 48px;
+        font-weight: bold;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .profile-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .file-input {
+        display: none;
+      }
+
+      .file-label {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #667eea;
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 14px;
+      }
+
+      .file-label:hover {
+        background: #5a67d8;
+        transform: translateY(-1px);
+      }
+
+      /* Links Management */
+      .links-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .add-link-btn {
+        padding: 10px 20px;
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .add-link-btn:hover {
+        background: #218838;
+        transform: translateY(-1px);
+      }
+
+      .link-item {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 15px;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+      }
+
+      .link-item:hover {
+        border-color: #667eea;
+        transform: translateY(-2px);
+      }
+
+      .link-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
+      .link-title {
+        font-weight: bold;
+        font-size: 16px;
+        color: #333;
+      }
+
+      .link-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .btn-small {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .btn-edit {
+        background: #ffc107;
+        color: #333;
+      }
+
+      .btn-edit:hover {
+        background: #ffcd39;
+      }
+
+      .btn-delete {
+        background: #dc3545;
+        color: white;
+      }
+
+      .btn-delete:hover {
+        background: #c82333;
+      }
+
+      .link-url {
+        color: #667eea;
+        font-size: 14px;
+        word-break: break-all;
+      }
+
+      /* Modal */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        backdrop-filter: blur(5px);
+      }
+
+      .modal.active {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modal-content {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      }
+
+      .modal-title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .modal-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: flex-end;
+        margin-top: 30px;
+      }
+
+      .btn-cancel {
+        padding: 10px 20px;
+        background: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      .btn-save {
+        padding: 10px 20px;
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      /* Loading and Messages */
+      .loading {
+        text-align: center;
+        padding: 20px;
+      }
+
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 15px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .message {
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .message.success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .message.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        .header {
+          text-align: center;
+        }
+
+        .user-info {
+          justify-content: center;
+        }
+
+        .links-header {
+          flex-direction: column;
+          gap: 15px;
+          align-items: stretch;
+        }
+
+        .link-header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 10px;
+        }
+
+        .link-actions {
+          width: 100%;
+          justify-content: flex-end;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+      <div class="login-card">
+        <h1 class="login-title">Painel Admin</h1>
+        <p class="login-subtitle">Gerencie seus links e perfil</p>
+
+        <div id="authMessage"></div>
+
+        <div id="loginForm">
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input
+              type="email"
+              id="loginEmail"
+              class="form-input"
+              placeholder="seu@email.com"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Senha</label>
+            <input
+              type="password"
+              id="loginPassword"
+              class="form-input"
+              placeholder="••••••••"
+              required
+            />
+          </div>
+
+          <button onclick="login()" class="btn btn-primary">Entrar</button>
+          <button onclick="showRegisterForm()" class="btn btn-secondary">
+            Criar Conta
+          </button>
+        </div>
+
+        <div id="registerForm" style="display: none">
+          <div class="form-group">
+            <label class="form-label">Nome</label>
+            <input
+              type="text"
+              id="registerName"
+              class="form-input"
+              placeholder="Seu nome"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input
+              type="email"
+              id="registerEmail"
+              class="form-input"
+              placeholder="seu@email.com"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Senha</label>
+            <input
+              type="password"
+              id="registerPassword"
+              class="form-input"
+              placeholder="••••••••"
+              required
+            />
+          </div>
+
+          <button onclick="register()" class="btn btn-primary">
+            Criar Conta
+          </button>
+          <button onclick="showLoginForm()" class="btn btn-secondary">
+            Já tenho conta
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="dashboard">
+      <div class="container">
+        <div class="header">
+          <div class="header-left">
+            <h1 class="header-title">Painel Administrativo</h1>
+            <p class="header-subtitle">Gerencie seus links e perfil</p>
+          </div>
+          <div class="user-info">
+            <div class="user-avatar" id="userAvatar">U</div>
+            <div>
+              <div style="font-weight: bold" id="userName">Usuário</div>
+              <div style="font-size: 12px; color: #666" id="userEmail">
+                email@example.com
+              </div>
+            </div>
+            <button onclick="logout()" class="logout-btn">Sair</button>
+          </div>
+        </div>
+
+        <div id="dashboardMessage"></div>
+
+        <div class="grid">
+          <!-- Profile Management -->
+          <div class="card">
+            <h2 class="card-title">Perfil</h2>
+
+            <div class="profile-upload">
+              <div class="profile-preview" id="profilePreview">
+                <span id="profileInitials">U</span>
+              </div>
+              <input
+                type="file"
+                id="profileImage"
+                class="file-input"
+                accept="image/*"
+                onchange="uploadProfileImage()"
+              />
+              <label for="profileImage" class="file-label">Alterar Foto</label>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Nome</label>
+              <input
+                type="text"
+                id="profileName"
+                class="form-input"
+                placeholder="Seu nome"
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Descrição</label>
+              <textarea
+                id="profileDescription"
+                class="form-input"
+                rows="3"
+                placeholder="Fale sobre você e suas especialidades"
+              ></textarea>
+            </div>
+
+            <button onclick="saveProfile()" class="btn btn-primary">
+              Salvar Perfil
+            </button>
+          </div>
+
+          <!-- Links Management -->
+          <div class="card">
+            <div class="links-header">
+              <h2 class="card-title">Meus Links</h2>
+              <button onclick="showAddLinkModal()" class="add-link-btn">
+                + Adicionar Link
+              </button>
+            </div>
+
+            <div id="linksList">
+              <div class="loading">
+                <div class="spinner"></div>
+                <p>Carregando links...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Link Modal -->
+    <div id="linkModal" class="modal">
+      <div class="modal-content">
+        <h3 class="modal-title" id="modalTitle">Adicionar Link</h3>
+
+        <div class="form-group">
+          <label class="form-label">Título</label>
+          <input
+            type="text"
+            id="linkTitle"
+            class="form-input"
+            placeholder="Nome do produto/serviço"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">URL</label>
+          <input
+            type="url"
+            id="linkUrl"
+            class="form-input"
+            placeholder="https://exemplo.com"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Ícone (emoji ou texto)</label>
+          <input
+            type="text"
+            id="linkIcon"
+            class="form-input"
+            placeholder="📱"
+            maxlength="10"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tipo</label>
+          <select id="linkType" class="form-input">
+            <option value="product">Produto</option>
+            <option value="social">Rede Social</option>
+            <option value="contact">Contato</option>
+            <option value="other">Outro</option>
+          </select>
+        </div>
+
+        <div class="modal-actions">
+          <button onclick="closeLinkModal()" class="btn-cancel">
+            Cancelar
+          </button>
+          <button onclick="saveLink()" class="btn-save">Salvar</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Configuração do Supabase
+      const SUPABASE_URL = "https://gnloqqfthodlbrbnhchn.supabase.co";
+      const SUPABASE_ANON_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdubG9xcWZ0aG9kbGJyYm5oY2huIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0NzY5NTIsImV4cCI6MjA2OTA1Mjk1Mn0.aZf6Ae0RSe4_Rr1s9N6Q4N3BcFjRnI5-HanknQZp4RY";
+
+      // Inicializar Supabase
+      const supabase = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+      );
+
+      let currentUser = null;
+      let editingLinkId = null;
+
+      // Verificar se usuário está logado ao carregar a página
+      window.addEventListener("load", async () => {
+        try {
+          const {
+            data: { user },
+          } = await supabase.auth.getUser();
+          if (user) {
+            currentUser = user;
+            showDashboard();
+          } else {
+            showLoginScreen();
+          }
+        } catch (error) {
+          console.error("Erro ao verificar usuário:", error);
+          showLoginScreen();
+        }
+      });
+
+      // Funções de Autenticação
+      function showLoginForm() {
+        document.getElementById("loginForm").style.display = "block";
+        document.getElementById("registerForm").style.display = "none";
+        clearMessage("authMessage");
+      }
+
+      function showRegisterForm() {
+        document.getElementById("loginForm").style.display = "none";
+        document.getElementById("registerForm").style.display = "block";
+        clearMessage("authMessage");
+      }
+
+      async function register() {
+        const name = document.getElementById("registerName").value;
+        const email = document.getElementById("registerEmail").value;
+        const password = document.getElementById("registerPassword").value;
+
+        if (!name || !email || !password) {
+          showMessage("authMessage", "Preencha todos os campos", "error");
+          return;
+        }
+
+        try {
+          const { data, error } = await supabase.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+              data: {
+                full_name: name,
+              },
+            },
+          });
+
+          if (error) {
+            showMessage("authMessage", error.message, "error");
+          } else {
+            showMessage(
+              "authMessage",
+              "Conta criada! Verifique seu email para confirmar.",
+              "success"
+            );
+            setTimeout(() => showLoginForm(), 2000);
+          }
+        } catch (error) {
+          showMessage(
+            "authMessage",
+            "Erro ao criar conta: " + error.message,
+            "error"
+          );
+        }
+      }
+
+      async function login() {
+        const email = document.getElementById("loginEmail").value;
+        const password = document.getElementById("loginPassword").value;
+
+        if (!email || !password) {
+          showMessage("authMessage", "Preencha todos os campos", "error");
+          return;
+        }
+
+        try {
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email: email,
+            password: password,
+          });
+
+          if (error) {
+            showMessage("authMessage", error.message, "error");
+          } else {
+            currentUser = data.user;
+            showDashboard();
+          }
+        } catch (error) {
+          showMessage(
+            "authMessage",
+            "Erro ao fazer login: " + error.message,
+            "error"
+          );
+        }
+      }
+
+      async function logout() {
+        try {
+          await supabase.auth.signOut();
+          currentUser = null;
+          showLoginScreen();
+        } catch (error) {
+          console.error("Erro ao fazer logout:", error);
+        }
+      }
+
+      // Funções de Interface
+      function showLoginScreen() {
+        document.getElementById("loginScreen").style.display = "flex";
+        document.getElementById("dashboard").classList.remove("active");
+      }
+
+      function showDashboard() {
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("dashboard").classList.add("active");
+        loadUserData();
+        loadLinks();
+      }
+
+      function showMessage(elementId, message, type) {
+        const element = document.getElementById(elementId);
+        element.innerHTML = `<div class="message ${type}">${message}</div>`;
+      }
+
+      function clearMessage(elementId) {
+        document.getElementById(elementId).innerHTML = "";
+      }
+
+      // Funções de Perfil
+      async function loadUserData() {
+        if (!currentUser) return;
+
+        // Atualizar informações do usuário na interface
+        const userName =
+          currentUser.user_metadata?.full_name ||
+          currentUser.email.split("@")[0];
+        const userEmail = currentUser.email;
+
+        document.getElementById("userName").textContent = userName;
+        document.getElementById("userEmail").textContent = userEmail;
+        document.getElementById("userAvatar").textContent = userName
+          .charAt(0)
+          .toUpperCase();
+        document.getElementById("profileInitials").textContent = userName
+          .charAt(0)
+          .toUpperCase();
+
+        // Carregar dados do perfil do banco
+        try {
+          const { data, error } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("user_id", currentUser.id)
+            .single();
+
+          if (data) {
+            document.getElementById("profileName").value = data.name || "";
+            document.getElementById("profileDescription").value =
+              data.description || "";
+
+            if (data.avatar_url) {
+              const img = document.createElement("img");
+              img.src = data.avatar_url;
+              img.onload = () => {
+                document.getElementById("profilePreview").innerHTML = "";
+                document.getElementById("profilePreview").appendChild(img);
+              };
+            }
+          }
+        } catch (error) {
+          console.error("Erro ao carregar perfil:", error);
+        }
+      }
+
+      async function saveProfile() {
+        const name = document.getElementById("profileName").value;
+        const description = document.getElementById("profileDescription").value;
+
+        try {
+          const { data, error } = await supabase.from("profiles").upsert({
+            user_id: currentUser.id,
+            name: name,
+            description: description,
+            updated_at: new Date().toISOString(),
+          });
+
+          if (error) {
+            showMessage(
+              "dashboardMessage",
+              "Erro ao salvar perfil: " + error.message,
+              "error"
+            );
+          } else {
+            showMessage(
+              "dashboardMessage",
+              "Perfil salvo com sucesso!",
+              "success"
+            );
+            setTimeout(() => clearMessage("dashboardMessage"), 3000);
+          }
+        } catch (error) {
+          showMessage(
+            "dashboardMessage",
+            "Erro ao salvar perfil: " + error.message,
+            "error"
+          );
+        }
+      }
+
+      async function uploadProfileImage() {
+        const fileInput = document.getElementById("profileImage");
+        const file = fileInput.files[0];
+
+        if (!file) return;
+
+        try {
+          const fileName = `${currentUser.id}/avatar.${file.name
+            .split(".")
+            .pop()}`;
+
+          const { data, error } = await supabase.storage
+            .from("avatars")
+            .upload(fileName, file, { upsert: true });
+
+          if (error) {
+            showMessage(
+              "dashboardMessage",
+              "Erro ao fazer upload da imagem: " + error.message,
+              "error"
+            );
+            return;
+          }
+
+          const { data: urlData } = supabase.storage
+            .from("avatars")
+            .getPublicUrl(fileName);
+
+          // Atualizar perfil com URL da imagem
+          await supabase.from("profiles").upsert({
+            user_id: currentUser.id,
+            avatar_url: urlData.publicUrl,
+            updated_at: new Date().toISOString(),
+          });
+
+          // Atualizar prévia
+          const img = document.createElement("img");
+          img.src = urlData.publicUrl;
+          document.getElementById("profilePreview").innerHTML = "";
+          document.getElementById("profilePreview").appendChild(img);
+
+          showMessage(
+            "dashboardMessage",
+            "Foto de perfil atualizada!",
+            "success"
+          );
+          setTimeout(() => clearMessage("dashboardMessage"), 3000);
+        } catch (error) {
+          showMessage(
+            "dashboardMessage",
+            "Erro ao fazer upload: " + error.message,
+            "error"
+          );
+        }
+      }
+
+      // Funções de Links
+      async function loadLinks() {
+        try {
+          const { data, error } = await supabase
+            .from("links")
+            .select("*")
+            .eq("user_id", currentUser.id)
+            .order("created_at", { ascending: false });
+
+          if (error) {
+            document.getElementById("linksList").innerHTML =
+              '<div class="message error">Erro ao carregar links: ' +
+              error.message +
+              "</div>";
+            return;
+          }
+
+          renderLinks(data || []);
+        } catch (error) {
+          document.getElementById("linksList").innerHTML =
+            '<div class="message error">Erro ao carregar links: ' +
+            error.message +
+            "</div>";
+        }
+      }
+
+      function renderLinks(links) {
+        const container = document.getElementById("linksList");
+
+        if (links.length === 0) {
+          container.innerHTML =
+            '<div class="message">Nenhum link cadastrado. Clique em "Adicionar Link" para começar.</div>';
+          return;
+        }
+
+        container.innerHTML = links
+          .map(
+            (link) => `
+                <div class="link-item">
+                    <div class="link-header">
+                        <div class="link-title">${link.icon} ${link.title}</div>
+                        <div class="link-actions">
+                            <button onclick="editLink(${link.id})" class="btn-small btn-edit">Editar</button>
+                            <button onclick="deleteLink(${link.id})" class="btn-small btn-delete">Excluir</button>
+                        </div>
+                    </div>
+                    <div class="link-url">${link.url}</div>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      function showAddLinkModal() {
+        editingLinkId = null;
+        document.getElementById("modalTitle").textContent = "Adicionar Link";
+        document.getElementById("linkTitle").value = "";
+        document.getElementById("linkUrl").value = "";
+        document.getElementById("linkIcon").value = "";
+        document.getElementById("linkType").value = "product";
+        document.getElementById("linkModal").classList.add("active");
+      }
+
+      async function editLink(linkId) {
+        try {
+          const { data, error } = await supabase
+            .from("links")
+            .select("*")
+            .eq("id", linkId)
+            .single();
+
+          if (error) {
+            showMessage(
+              "dashboardMessage",
+              "Erro ao carregar link: " + error.message,
+              "error"
+            );
+            return;
+          }
+
+          editingLinkId = linkId;
+          document.getElementById("modalTitle").textContent = "Editar Link";
+          document.getElementById("linkTitle").value = data.title;
+          document.getElementById("linkUrl").value = data.url;
+          document.getElementById("linkIcon").value = data.icon;
+          document.getElementById("linkType").value = data.type;
+          document.getElementById("linkModal").classList.add("active");
+        } catch (error) {
+          showMessage(
+            "dashboardMessage",
+            "Erro ao carregar link: " + error.message,
+            "error"
+          );
+        }
+      }
+
+      async function deleteLink(linkId) {
+        if (!confirm("Tem certeza que deseja excluir este link?")) {
+          return;
+        }
+
+        try {
+          const { error } = await supabase
+            .from("links")
+            .delete()
+            .eq("id", linkId);
+
+          if (error) {
+            showMessage(
+              "dashboardMessage",
+              "Erro ao excluir link: " + error.message,
+              "error"
+            );
+          } else {
+            showMessage(
+              "dashboardMessage",
+              "Link excluído com sucesso!",
+              "success"
+            );
+            setTimeout(() => clearMessage("dashboardMessage"), 3000);
+            loadLinks();
+          }
+        } catch (error) {
+          showMessage(
+            "dashboardMessage",
+            "Erro ao excluir link: " + error.message,
+            "error"
+          );
+        }
+      }
+
+      async function saveLink() {
+        const title = document.getElementById("linkTitle").value;
+        const url = document.getElementById("linkUrl").value;
+        const icon = document.getElementById("linkIcon").value;
+        const type = document.getElementById("linkType").value;
+
+        if (!title || !url) {
+          alert("Preencha pelo menos o título e a URL");
+          return;
+        }
+
+        try {
+          let result;
+
+          if (editingLinkId) {
+            // Editando link existente
+            result = await supabase
+              .from("links")
+              .update({
+                title: title,
+                url: url,
+                icon: icon || "🔗",
+                type: type,
+                updated_at: new Date().toISOString(),
+              })
+              .eq("id", editingLinkId);
+          } else {
+            // Criando novo link
+            result = await supabase.from("links").insert({
+              user_id: currentUser.id,
+              title: title,
+              url: url,
+              icon: icon || "🔗",
+              type: type,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            });
+          }
+
+          if (result.error) {
+            showMessage(
+              "dashboardMessage",
+              "Erro ao salvar link: " + result.error.message,
+              "error"
+            );
+          } else {
+            showMessage(
+              "dashboardMessage",
+              "Link salvo com sucesso!",
+              "success"
+            );
+            setTimeout(() => clearMessage("dashboardMessage"), 3000);
+            closeLinkModal();
+            loadLinks();
+          }
+        } catch (error) {
+          showMessage(
+            "dashboardMessage",
+            "Erro ao salvar link: " + error.message,
+            "error"
+          );
+        }
+      }
+
+      function closeLinkModal() {
+        document.getElementById("linkModal").classList.remove("active");
+        editingLinkId = null;
+      }
+
+      // Fechar modal ao clicar fora
+      document
+        .getElementById("linkModal")
+        .addEventListener("click", function (e) {
+          if (e.target === this) {
+            closeLinkModal();
+          }
+        });
+
+      // Permitir Enter para fazer login
+      document.addEventListener("DOMContentLoaded", function () {
+        const loginInputs = ["loginEmail", "loginPassword"];
+        loginInputs.forEach((id) => {
+          document
+            .getElementById(id)
+            ?.addEventListener("keypress", function (e) {
+              if (e.key === "Enter") {
+                login();
+              }
+            });
+        });
+
+        const registerInputs = [
+          "registerName",
+          "registerEmail",
+          "registerPassword",
+        ];
+        registerInputs.forEach((id) => {
+          document
+            .getElementById(id)
+            ?.addEventListener("keypress", function (e) {
+              if (e.key === "Enter") {
+                register();
+              }
+            });
+        });
+      });
+
+      // Exemplo de estrutura das tabelas do Supabase (execute no SQL Editor)
+      /*
+        -- Criar tabela de perfis
+        CREATE TABLE profiles (
+            id SERIAL PRIMARY KEY,
+            user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+            name TEXT,
+            description TEXT,
+            avatar_url TEXT,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+            updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+            UNIQUE(user_id)
+        );
+
+        -- Criar tabela de links
+        CREATE TABLE links (
+            id SERIAL PRIMARY KEY,
+            user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+            title TEXT NOT NULL,
+            url TEXT NOT NULL,
+            icon TEXT DEFAULT '🔗',
+            type TEXT DEFAULT 'product',
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+            updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+        );
+
+        -- Criar bucket para avatars no Storage
+        INSERT INTO storage.buckets (id, name, public) VALUES ('avatars', 'avatars', true);
+
+        -- Política RLS para profiles
+        ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+        
+        CREATE POLICY "Users can view own profile" ON profiles
+            FOR SELECT USING (auth.uid() = user_id);
+            
+        CREATE POLICY "Users can update own profile" ON profiles
+            FOR ALL USING (auth.uid() = user_id);
+
+        -- Política RLS para links
+        ALTER TABLE links ENABLE ROW LEVEL SECURITY;
+        
+        CREATE POLICY "Users can manage own links" ON links
+            FOR ALL USING (auth.uid() = user_id);
+
+        -- Política para storage de avatars
+        CREATE POLICY "Avatar images are publicly accessible" ON storage.objects
+            FOR SELECT USING (bucket_id = 'avatars');
+            
+        CREATE POLICY "Users can upload their own avatar" ON storage.objects
+            FOR INSERT WITH CHECK (bucket_id = 'avatars' AND auth.uid()::text = (storage.foldername(name))[1]);
+            
+        CREATE POLICY "Users can update their own avatar" ON storage.objects
+            FOR UPDATE USING (bucket_id = 'avatars' AND auth.uid()::text = (storage.foldername(name))[1]);
+        */
+    </script>
+  
+<script type="module">
+  // Firebase App (core)
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDAOcF_0Q1aDDTDrrvi_92vP38BN9fSXlg",
+    authDomain: "linknectix.firebaseapp.com",
+    projectId: "linknectix",
+    storageBucket: "linknectix.appspot.com",
+    messagingSenderId: "408127476231",
+    appId: "1:408127476231:web:f075289ee352f32dd4d0a2"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const storage = getStorage(app);
+
+  // Aqui entrariam os scripts de autenticação e painel convertidos para Firebase...
+</script>
+
+</body>
+</html>
